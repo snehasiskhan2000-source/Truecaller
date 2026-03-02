@@ -55,16 +55,15 @@ async def handle_lookup(client, message: Message):
     if len(clean_number) > 10 and clean_number.startswith("91"):
         clean_number = clean_number[2:]
 
-    # 1. Ultra-Premium Initial Animation
-    loading_text = "<b>[    INITIATING    ]</b>\n<i>⚡ Establishing secure uplink to Clario servers...</i>"
+    # 1. NEW PREMIUM TERMINAL ANIMATION 💀
+    loading_text = "💀 <b>CLARIO TERMINAL</b>\n\n[▰▱▱▱▱▱▱▱▱▱] 10%\n>_ <i>authenticating request...</i>"
     msg = await message.reply_text(loading_text, parse_mode=ParseMode.HTML)
     
-    # 2. Sleek Terminal Loading Sequence
     anim_stages = [
-        "<b>[▓▓░░░░░░░░] 20%</b>\n<i>🔐 Bypassing regional firewalls...</i>",
-        "<b>[▓▓▓▓▓░░░░░] 50%</b>\n<i>📡 Intercepting target telemetrics...</i>",
-        "<b>[▓▓▓▓▓▓▓▓░░] 80%</b>\n<i>🧬 Decrypting Aadhaar & Identity records...</i>",
-        "<b>[▓▓▓▓▓▓▓▓▓▓] 100%</b>\n<i>✅ Intelligence secured. Structuring payload...</i>"
+        "💀 <b>CLARIO TERMINAL</b>\n\n[▰▰▰▰▱▱▱▱▱▱] 40%\n>_ <i>breaching mainframe...</i>",
+        "💀 <b>CLARIO TERMINAL</b>\n\n[▰▰▰▰▰▰▰▱▱▱] 70%\n>_ <i>extracting raw packets...</i>",
+        "💀 <b>CLARIO TERMINAL</b>\n\n[▰▰▰▰▰▰▰▰▰▱] 90%\n>_ <i>decrypting aadhaar signature...</i>",
+        "💀 <b>CLARIO TERMINAL</b>\n\n[▰▰▰▰▰▰▰▰▰▰] 100%\n>_ <i>payload secured.</i>"
     ]
     
     for stage in anim_stages:
@@ -114,12 +113,13 @@ async def handle_lookup(client, message: Message):
             raw_address = record.get("address", "N/A")
             clean_address = raw_address.replace("!", ", ").strip(", ")
 
+            # Note: Used <span class="tg-spoiler"> to force Telegram to blur the Aadhaar
             output_msg += f"👤 <b>Name:</b> {name}\n"
             output_msg += f"👨 <b>Father:</b> {father}\n"
             output_msg += f"📞 <b>Mobile:</b> <code>{mobile}</code>\n"
-            output_msg += f"📞 <b>Alt Mobile:</b> <code>{alt_mobile}</code>\n"
+            output_msg += f"📞 <b>Alt Mobile:</b> {alt_mobile}\n"
             output_msg += f"✉️ <b>Email:</b> {email}\n"
-            output_msg += f"🪪 <b>Aadhaar:</b> <tg-spoiler>{aadhaar_id}</tg-spoiler>\n"
+            output_msg += f"🪪 <b>Aadhaar:</b> <span class=\"tg-spoiler\">{aadhaar_id}</span>\n"
             output_msg += f"🏠 <b>Address:</b> {clean_address}\n"
             output_msg += f"🆔 <b>Circle:</b> {circle}\n"
             output_msg += "━━━━━━━━━━━━━━━━━━━\n\n"
@@ -131,7 +131,7 @@ async def handle_lookup(client, message: Message):
         # 6. Send final payload
         await msg.edit_text(output_msg, parse_mode=ParseMode.HTML)
 
-        # 7. SILENT CRYSTAL CLEAN PROTOCOL: 60 Second Delete Timer (No Warning Text)
+        # 7. SILENT CRYSTAL CLEAN PROTOCOL: 60 Second Delete Timer
         await asyncio.sleep(60)
         try:
             await msg.delete() 
