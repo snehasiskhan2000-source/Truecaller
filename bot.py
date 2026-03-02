@@ -14,7 +14,7 @@ BOT_TOKEN = os.environ.get("BOT_TOKEN", "YOUR_BOT_TOKEN_HERE")
 
 # Initialize Pyrogram Client
 app = Client(
-    "AdvanceLookupBot",
+    "ClarioBot",
     api_id=API_ID,
     api_hash=API_HASH,
     bot_token=BOT_TOKEN
@@ -22,7 +22,7 @@ app = Client(
 
 # --- DUMMY WEB SERVER FOR RENDER ---
 async def handle(request):
-    return web.Response(text="💀 Premium Bot is Online!")
+    return web.Response(text="💀 Clario Premium is Online!")
 
 async def web_server():
     web_app = web.Application()
@@ -37,16 +37,22 @@ async def web_server():
 @app.on_message(filters.command(["start", "help"]))
 async def start(client, message: Message):
     welcome_text = (
-        "👋 <b>Welcome to the Advance Lookup Bot!</b>\n\n"
-        "Send me a 10-digit number (e.g., 8436829060) and I'll fetch the target's details."
+        "💎 <b>Welcome to Clario.</b>\n\n"
+        "<i>The ultimate secure lookup terminal.</i> 🦅\n\n"
+        "Provide a 10-digit mobile number, and I will initiate a real-time extraction of the target's registry data.\n\n"
+        "⚠️ <i>Note: For absolute privacy, extracted intelligence automatically self-destructs after 60 seconds.</i>"
     )
     await message.reply_text(welcome_text, parse_mode=ParseMode.HTML)
 
 @app.on_message(filters.text & filters.private)
 async def handle_lookup(client, message: Message):
+    # Ignore commands
+    if message.text.startswith("/"):
+        return
+        
     target_number = message.text.strip()
     
-    # Clean the number (remove +91 or spaces if the user adds them)
+    # Clean the number
     clean_number = "".join(filter(str.isdigit, target_number))
     if len(clean_number) > 10 and clean_number.startswith("91"):
         clean_number = clean_number[2:]
@@ -57,19 +63,19 @@ async def handle_lookup(client, message: Message):
     
     # 2. High-End Editing Animation Sequence
     anim_stages = [
-        "<b>[■■■■□□□□□□] 40%</b>\n<i>🔍 Scanning Truecaller database...</i>",
+        "<b>[■■■■□□□□□□] 40%</b>\n<i>🔍 Scanning databases...</i>",
         "<b>[■■■■■■■□□□] 70%</b>\n<i>🧬 Extracting target identity & Aadhaar...</i>",
         "<b>[■■■■■■■■■■] 100%</b>\n<i>✅ Decrypting payload...</i>"
     ]
     
     for stage in anim_stages:
-        await asyncio.sleep(0.8) # Wait slightly to avoid Telegram Flood limits
+        await asyncio.sleep(0.6) 
         try:
             await msg.edit_text(stage, parse_mode=ParseMode.HTML)
         except:
-            pass # Ignore if telegram blocks a rapid edit
+            pass
 
-    # 3. Fetch Data via aiohttp (Fast Async)
+    # 3. Fetch Data via aiohttp
     url = f"https://true-call-check.vercel.app/api/truecaller?num={clean_number}"
     
     try:
@@ -86,47 +92,66 @@ async def handle_lookup(client, message: Message):
             await msg.edit_text("❌ <b>Target Ghosted:</b> No records found.", parse_mode=ParseMode.HTML)
             return
 
-        # 4. Format the final output
+        # 4. Filter out duplicate records
+        unique_records = []
+        seen = set()
+        for r in records:
+            # Create a unique signature using Name and ID so we don't print duplicates
+            sig = f"{r.get('name')}_{r.get('id')}"
+            if sig not in seen:
+                seen.add(sig)
+                unique_records.append(r)
+
+        # 5. Format the final output
         output_msg = ""
-        for i, record in enumerate(records, start=1):
+        for record in unique_records:
             name = record.get("name", "N/A")
             father = record.get("father_name", "N/A")
             mobile = record.get("mobile", target_number)
-            alt_mobile = record.get("alt_mobile", "N/A")
+            alt_mobile = record.get("alt_mobile", "None")
+            email = record.get("email", "None") or "None" # In case the JSON returns 'null'
             aadhaar_id = record.get("id", "N/A")
             circle = record.get("circle", "N/A")
             
-            # Clean up that messy address string (!Fingagachi!...)
+            # Clean up that messy address string
             raw_address = record.get("address", "N/A")
             clean_address = raw_address.replace("!", ", ").strip(", ")
 
-            output_msg += f"🗂 <b>Record {i}</b>\n"
             output_msg += f"👤 <b>Name:</b> {name}\n"
             output_msg += f"👨 <b>Father:</b> {father}\n"
             output_msg += f"📞 <b>Mobile:</b> <code>{mobile}</code>\n"
             output_msg += f"📞 <b>Alt Mobile:</b> <code>{alt_mobile}</code>\n"
-            # Pyrogram HTML tag for spoilers
+            output_msg += f"✉️ <b>Email:</b> {email}\n"
             output_msg += f"🪪 <b>Aadhaar:</b> <tg-spoiler>{aadhaar_id}</tg-spoiler>\n"
             output_msg += f"🏠 <b>Address:</b> {clean_address}\n"
             output_msg += f"🆔 <b>Circle:</b> {circle}\n"
-            output_msg += "━━━━━━━━━━━━━━━━━━━\n"
+            output_msg += "━━━━━━━━━━━━━━━━━━━\n\n"
         
         bot_info = await client.get_me()
-        output_msg += f"\n👨‍💻 Checked by: @{bot_info.username}\n"
-        output_msg += "👑 Powered by: @TheAdvanceBots"
+        output_msg += f"👨‍💻 Checked by: @{bot_info.username}\n"
+        output_msg += "👑 Powered by: @techbittu69\n\n"
+        output_msg += "⏱ <i>Message will self-destruct in 60s.</i>"
         
-        # 5. Send final payload
+        # 6. Send final payload
         await msg.edit_text(output_msg, parse_mode=ParseMode.HTML)
+
+        # 7. CRYSTAL CLEAN PROTOCOL: 60 Second Delete Timer
+        await asyncio.sleep(60)
+        try:
+            await msg.delete() # Deletes the bot's data message
+            await message.delete() # Deletes the user's number message for total cleanliness
+        except:
+            pass
 
     except Exception as e:
         await msg.edit_text(f"❌ <b>System Failure:</b> {str(e)}", parse_mode=ParseMode.HTML)
 
 # --- RUN THE APP ---
 async def main():
-    await web_server() # Starts the Render health-check server
-    await app.start()  # Starts the bot
-    print("💀 Premium Bot is running...")
-    await pyrogram.idle() # Keeps it running
+    await web_server() 
+    await app.start()  
+    print("💀 Clario Premium is running...")
+    await pyrogram.idle() 
     await app.stop()
 
 if __name__ == "__main__":
