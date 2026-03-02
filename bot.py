@@ -5,6 +5,7 @@ import pyrogram
 from pyrogram import Client, filters
 from pyrogram.types import Message
 from pyrogram.enums import ParseMode
+from pyrogram.errors import FloodWait
 from aiohttp import web
 
 # --- CONFIGURATION ---
@@ -55,25 +56,32 @@ async def handle_lookup(client, message: Message):
     if len(clean_number) > 10 and clean_number.startswith("91"):
         clean_number = clean_number[2:]
 
-    # 1. NEW PREMIUM TERMINAL ANIMATION 💀
-    loading_text = "💀 <b>CLARIO TERMINAL</b>\n\n[▰▱▱▱▱▱▱▱▱▱] 10%\n>_ <i>authenticating request...</i>"
-    msg = await message.reply_text(loading_text, parse_mode=ParseMode.HTML)
+    # 1. FUNNY & PREMIUM RAPID-FIRE ANIMATION SEQUENCE
+    msg = await message.reply_text("<i>Initializing...</i>", parse_mode=ParseMode.HTML)
     
     anim_stages = [
-        "💀 <b>CLARIO TERMINAL</b>\n\n[▰▰▰▰▱▱▱▱▱▱] 40%\n>_ <i>breaching mainframe...</i>",
-        "💀 <b>CLARIO TERMINAL</b>\n\n[▰▰▰▰▰▰▰▱▱▱] 70%\n>_ <i>extracting raw packets...</i>",
-        "💀 <b>CLARIO TERMINAL</b>\n\n[▰▰▰▰▰▰▰▰▰▱] 90%\n>_ <i>decrypting aadhaar signature...</i>",
-        "💀 <b>CLARIO TERMINAL</b>\n\n[▰▰▰▰▰▰▰▰▰▰] 100%\n>_ <i>payload secured.</i>"
+        "🛸 <i>Connecting To Jadoo...</i>",
+        "🚀 <i>Consulting To Elon Mask...</i>",
+        "🛰 <i>Contacting To NASA Satellites...</i>",
+        "🌌 <i>Calling To Stephen Hawking...</i>",
+        "🧬 <i>Running DNA Analysis...</i>",
+        "⏳ <i>Decrypting Space-Time...</i>",
+        "🔭 <i>Contacting To Hubble Telescope...</i>",
+        "☀️ <i>Getting The Info From The Sun...</i>",
+        "💔 <i>Calling To Ex...</i>"
     ]
     
+    # Force the jokes to play fast (0.4s each) to look like a high-speed hack
     for stage in anim_stages:
-        await asyncio.sleep(0.7) 
         try:
             await msg.edit_text(stage, parse_mode=ParseMode.HTML)
+            await asyncio.sleep(0.4) 
+        except FloodWait as e:
+            await asyncio.sleep(e.value) # Respect Telegram's anti-spam limits safely
         except:
             pass
 
-    # 3. Fetch Data via aiohttp
+    # 2. Fetch Data via aiohttp
     url = f"https://true-call-check.vercel.app/api/truecaller?num={clean_number}"
     
     try:
@@ -90,7 +98,7 @@ async def handle_lookup(client, message: Message):
             await msg.edit_text("❌ <b>Target Ghosted:</b> No records found.", parse_mode=ParseMode.HTML)
             return
 
-        # 4. Filter out duplicate records
+        # 3. Filter out duplicate records
         unique_records = []
         seen = set()
         for r in records:
@@ -99,7 +107,7 @@ async def handle_lookup(client, message: Message):
                 seen.add(sig)
                 unique_records.append(r)
 
-        # 5. Format the final output
+        # 4. Format the final output
         output_msg = ""
         for record in unique_records:
             name = record.get("name", "N/A")
@@ -113,13 +121,13 @@ async def handle_lookup(client, message: Message):
             raw_address = record.get("address", "N/A")
             clean_address = raw_address.replace("!", ", ").strip(", ")
 
-            # Note: Used <span class="tg-spoiler"> to force Telegram to blur the Aadhaar
             output_msg += f"👤 <b>Name:</b> {name}\n"
             output_msg += f"👨 <b>Father:</b> {father}\n"
             output_msg += f"📞 <b>Mobile:</b> <code>{mobile}</code>\n"
             output_msg += f"📞 <b>Alt Mobile:</b> {alt_mobile}\n"
             output_msg += f"✉️ <b>Email:</b> {email}\n"
-            output_msg += f"🪪 <b>Aadhaar:</b> <span class=\"tg-spoiler\">{aadhaar_id}</span>\n"
+            # Explicit and strict Telegram HTML spoiler format
+            output_msg += f"🪪 <b>Aadhaar:</b> <tg-spoiler>{aadhaar_id}</tg-spoiler>\n"
             output_msg += f"🏠 <b>Address:</b> {clean_address}\n"
             output_msg += f"🆔 <b>Circle:</b> {circle}\n"
             output_msg += "━━━━━━━━━━━━━━━━━━━\n\n"
@@ -128,10 +136,14 @@ async def handle_lookup(client, message: Message):
         output_msg += f"👨‍💻 Checked by: @{bot_info.username}\n"
         output_msg += "👑 Powered by: @techbittu69"
         
-        # 6. Send final payload
-        await msg.edit_text(output_msg, parse_mode=ParseMode.HTML)
+        # 5. Send final payload
+        try:
+            await msg.edit_text(output_msg, parse_mode=ParseMode.HTML)
+        except FloodWait as e:
+            await asyncio.sleep(e.value)
+            await msg.edit_text(output_msg, parse_mode=ParseMode.HTML)
 
-        # 7. SILENT CRYSTAL CLEAN PROTOCOL: 60 Second Delete Timer
+        # 6. SILENT CRYSTAL CLEAN PROTOCOL: 60 Second Delete Timer
         await asyncio.sleep(60)
         try:
             await msg.delete() 
