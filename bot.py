@@ -4,7 +4,7 @@ import aiohttp
 import pyrogram
 from pyrogram import Client, filters
 from pyrogram.types import Message
-from pyrogram.enums import ParseMode
+from pyrogram.enums import ParseMode, ChatAction
 from pyrogram.errors import FloodWait
 from aiohttp import web
 
@@ -56,7 +56,10 @@ async def handle_lookup(client, message: Message):
     if len(clean_number) > 10 and clean_number.startswith("91"):
         clean_number = clean_number[2:]
 
-    # 1. FUNNY & PREMIUM RAPID-FIRE ANIMATION SEQUENCE
+    # Show "Bot is typing..." at the top of the user's screen for a native feel
+    await client.send_chat_action(message.chat.id, ChatAction.TYPING)
+
+    # 1. FUNNY FAST-EDIT ANIMATION SEQUENCE
     msg = await message.reply_text("<i>Initializing...</i>", parse_mode=ParseMode.HTML)
     
     anim_stages = [
@@ -71,13 +74,13 @@ async def handle_lookup(client, message: Message):
         "💔 <i>Calling To Ex...</i>"
     ]
     
-    # Force the jokes to play fast (0.4s each) to look like a high-speed hack
+    # Fast edit loop
     for stage in anim_stages:
         try:
             await msg.edit_text(stage, parse_mode=ParseMode.HTML)
             await asyncio.sleep(0.4) 
         except FloodWait as e:
-            await asyncio.sleep(e.value) # Respect Telegram's anti-spam limits safely
+            await asyncio.sleep(e.value)
         except:
             pass
 
@@ -98,7 +101,6 @@ async def handle_lookup(client, message: Message):
             await msg.edit_text("❌ <b>Target Ghosted:</b> No records found.", parse_mode=ParseMode.HTML)
             return
 
-        # 3. Filter out duplicate records
         unique_records = []
         seen = set()
         for r in records:
@@ -107,7 +109,7 @@ async def handle_lookup(client, message: Message):
                 seen.add(sig)
                 unique_records.append(r)
 
-        # 4. Format the final output
+        # 3. Format the final output
         output_msg = ""
         for record in unique_records:
             name = record.get("name", "N/A")
@@ -126,7 +128,7 @@ async def handle_lookup(client, message: Message):
             output_msg += f"📞 <b>Mobile:</b> <code>{mobile}</code>\n"
             output_msg += f"📞 <b>Alt Mobile:</b> {alt_mobile}\n"
             output_msg += f"✉️ <b>Email:</b> {email}\n"
-            # Explicit and strict Telegram HTML spoiler format
+            # Explicit Telegram spoiler format
             output_msg += f"🪪 <b>Aadhaar:</b> <tg-spoiler>{aadhaar_id}</tg-spoiler>\n"
             output_msg += f"🏠 <b>Address:</b> {clean_address}\n"
             output_msg += f"🆔 <b>Circle:</b> {circle}\n"
@@ -136,17 +138,16 @@ async def handle_lookup(client, message: Message):
         output_msg += f"👨‍💻 Checked by: @{bot_info.username}\n"
         output_msg += "👑 Powered by: @techbittu69"
         
-        # 5. Send final payload
-        try:
-            await msg.edit_text(output_msg, parse_mode=ParseMode.HTML)
-        except FloodWait as e:
-            await asyncio.sleep(e.value)
-            await msg.edit_text(output_msg, parse_mode=ParseMode.HTML)
+        # 4. RESTORE ARRIVAL ANIMATION
+        # We delete the loading message, and send the final intelligence as a NEW message 
+        # so it pops into the chat smoothly.
+        await msg.delete()
+        final_msg = await message.reply_text(output_msg, parse_mode=ParseMode.HTML)
 
-        # 6. SILENT CRYSTAL CLEAN PROTOCOL: 60 Second Delete Timer
+        # 5. SILENT CRYSTAL CLEAN PROTOCOL: 60 Second Delete Timer
         await asyncio.sleep(60)
         try:
-            await msg.delete() 
+            await final_msg.delete() 
             await message.delete() 
         except:
             pass
