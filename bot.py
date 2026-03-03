@@ -116,12 +116,12 @@ async def handle_broadcast(client: Client, message: Message):
         
         for user_id in user_db:
             try:
-                await client.send_message(user_id, f"🚨 **ATTENTION**\n\n{broadcast_msg}")
+                await client.send_message(user_id, f"🚨 **Clario...**\n\n{broadcast_msg}")
                 success += 1
                 await asyncio.sleep(0.1) # Prevent FloodWait
             except FloodWait as e:
                 await asyncio.sleep(e.value)
-                await client.send_message(user_id, f"🚨 **ATTENTION**\n\n{broadcast_msg}")
+                await client.send_message(user_id, f"🚨 **Clario...**\n\n{broadcast_msg}")
                 success += 1
             except Exception:
                 failed += 1
@@ -135,7 +135,13 @@ async def start(client, message: Message):
     user_db.add(message.from_user.id) # Add user to DB
     
     if not bot_live and message.from_user.id != ADMIN_ID:
-        await message.reply_text("Bot Is Not Live👀")
+        await message.reply_text("🔧 Maintenance Mode
+
+⚠️ The bot is currently under maintenance.
+Please wait while we improve our services.
+
+Join for Updates: @techbittu69
+⏰ We'll be back soon!")
         return
 
     welcome_text = (
