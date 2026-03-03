@@ -116,12 +116,12 @@ async def handle_broadcast(client: Client, message: Message):
         
         for user_id in user_db:
             try:
-                await client.send_message(user_id, f"📢 **Broadcast**\n\n{broadcast_msg}")
+                await client.send_message(user_id, f"🚨 **ATTENTION**\n\n{broadcast_msg}")
                 success += 1
                 await asyncio.sleep(0.1) # Prevent FloodWait
             except FloodWait as e:
                 await asyncio.sleep(e.value)
-                await client.send_message(user_id, f"📢 **Broadcast**\n\n{broadcast_msg}")
+                await client.send_message(user_id, f"🚨 **ATTENTION**\n\n{broadcast_msg}")
                 success += 1
             except Exception:
                 failed += 1
